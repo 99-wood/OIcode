@@ -60,15 +60,6 @@ inline int read() {
 const int MAXN = 20010;
 int a[MAXN][200];
 ll f[MAXN];
-//int bs(int n, int p, int w){
-//	int l = 1, r = n + 1;
-//	while(l < r - 1){
-//		int m = (l + r) >> 1;
-//		if(a[p][m] * 2 < w) l = m;
-//		else r = m - 1;
-//	}
-//	return l;
-//}
 int main(){
 	int s = read(), n = read(), m = read();
 	rep(i, 1, s){
