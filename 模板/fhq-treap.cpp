@@ -62,6 +62,7 @@ inline int read(){
 }
 const int MAXN = 200010;
 int siz[MAXN], val[MAXN], rnd[MAXN], tree[MAXN][2], root, endd;
+
 void upd(int p){
 	if(p == 0){
 		siz[p] = 0;
