@@ -65,6 +65,7 @@ void add(int x, int y, int w){
 	head[x] = endd;
 	to[endd] = y;
 	d[endd] = w;
+	return;
 }
 int b[10000010], ans[MAXN];
 int ask[MAXN];
