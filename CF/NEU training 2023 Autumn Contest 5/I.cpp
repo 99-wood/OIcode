@@ -60,7 +60,6 @@ inline int read(){
 	}
 	return b?-a:a;
 }
-const int MAXN = 50;
 int main(){
 	int t;
 	cin >> t;
