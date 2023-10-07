@@ -56,9 +56,10 @@ inline int read() {
 	return b?-a:a;
 }
 int s, t, siz;
-const int MAXN = 1e6;
+const int MAXN = 4e5;
 const int INF = 0x3f3f3f3f;
 int head[MAXN], nxt[MAXN], to[MAXN], w[MAXN], now[MAXN], cnt[MAXN], dep[MAXN], end1 = 0;
+int head_[MAXN], nxt_[MAXN], to_[MAXN], w_[MAXN], end1_;
 void add(int x, int y, int ww){
 	to[end1] = y;
 	w[end1] = ww;
@@ -67,8 +68,12 @@ void add(int x, int y, int ww){
 	end1++;
 	return;
 }
-int maxflow;
+ll maxflow;
 int dfs(int p, int flow){
+	if(p == t){
+		maxflow += flow;
+		return flow;
+	}
 	int re = 0;
 	for(; now[p] != -1; now[p] = nxt[now[p]]){
 		int pp = to[now[p]];
@@ -82,19 +87,114 @@ int dfs(int p, int flow){
 	}
 	if(flow){
 		cnt[dep[p]]--;
-		if(!cnt[dep[p]]) dep[s] = siz;
+		if(!cnt[dep[p]]) dep[s] = t;
 		cnt[++dep[p]]++;
 		now[p] = head[p];
 	}
 	return re;
 }
 void ISAP(){
-	while(dep[s] < siz) dfs(s, INF);
+	maxflow = 0;
+	cnt[0] = siz;
+	rep(i, s, t){
+		now[i] = head[i];
+		dep[i] = 0;
+	}
+	while(dep[s] < t) dfs(s, INF);
+}
+void cop(){
+	end1_ = end1;
+	rep(i, s, t) head_[i] = head[i];
+	frep(i, 0, end1_){
+		to_[i] = to[i];
+		nxt_[i] = nxt[i];
+		w_[i] = w[i];
+	}
+	return;
+}
+void pas(){
+	end1 = end1_;
+	rep(i, s, t) head[i] = head_[i];
+	frep(i, 0, end1){
+		to[i] = to_[i];
+		nxt[i] = nxt_[i];
+		w[i] = w_[i];
+	}
+	return;
 }
 int a[MAXN];
+struct req{
+	int x, y, i, j, k;
+}q[10];
+int n, m;
+#define trans(a, b) (b * n + a)
 int main(){
 	memset(head, -1, sizeof(head));
-	int n = read(), m = read();
-	
+	n = read(), m = read();
+	s = 0;
+	t = 16 * n + 1;
+	siz = t + 1;
+	rep(i, 1, m){
+		int x = read() + 1, y = read() + 1;
+		frep(j, 0, 16){
+			add(trans(x, j), trans(y, j), 1);
+			add(trans(y, j), trans(x, j), 1);	
+		}
+	}
+	rep(i, 1, n){
+		a[i] = read();
+		if(a[i] == -1){
+			continue;
+		}
+		else{
+			frep(j, 0, 16){
+				if((a[i] >> j) & 1){
+					add(trans(i, j), t, INF);
+					add(t, trans(i, j), 0);
+				}
+				else{
+					add(s, trans(i, j), INF);
+					add(trans(i, j), s, 0);
+				}
+			}
+		}
+	}
+	cop();
+	int rq = read();
+	rep(i, 1, rq){
+		q[i].k = read();
+		q[i].x = read() + 1;
+		q[i].i = read();
+		q[i].y = read() + 1;
+		q[i].j = read();
+	}
+	ll ans = INF;
+	frep(k, 0, 1 << rq){
+		pas();
+		rep(i, 1, rq){
+			if(q[i].k){
+				if(k & (1 << (i - 1))){
+					//x := 1
+					add(s, trans(q[i].y, q[i].j), INF);
+					add(trans(q[i].y, q[i].j), s, 0);
+					add(trans(q[i].x, q[i].i), t, INF);
+					add(t, trans(q[i].x, q[i].i), 0);
+				}
+				else{
+					add(s, trans(q[i].x, q[i].i), INF);
+					add(trans(q[i].x, q[i].i), s, 0);
+					add(trans(q[i].y, q[i].j), t, INF);
+					add(t, trans(q[i].y, q[i].j), 0);
+				}
+			}
+			else{
+				add(trans(q[i].x, q[i].i), trans(q[i].y, q[i].j), INF);
+				add(trans(q[i].y, q[i].j), trans(q[i].x, q[i].i), INF);
+			}
+		}
+		ISAP();
+		ans = min(ans, maxflow);
+	}
+	printf((ans == INF ? "-1" : "%lld"), ans);
 	return 0;
 }
