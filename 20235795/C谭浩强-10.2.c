@@ -1,5 +1,5 @@
 /*
-* File: C-Ì·ºÆÇ¿-10.1.c
+* File: C-Ì·ºÆÇ¿-10.2.c
 * Author: 99_wood
 * Date: 2023-10-11
 */
@@ -19,34 +19,38 @@ char t[MAXN][MAXN];
 
 struct string{
 	char s[MAXN];
-	
-	void get(){
-		scanf("%s", s);
-		return
+}str[MAXN];
+int len(struct string a){ //×Ö·û´®½á¹¹Ìå 
+	return strlen(a.s);
+}
+bool cmp (struct string a, struct string b){ //±È½Ï×Ö·û´®×ÖµäÐò 
+	int len1 = len(a), len2 = len(b);
+	int l = len1 < len2 ? len1 : len2;
+	for(int i = 0; i < l; ++i){
+		if(a.s[i] < b.s[i]) return true;
+		else if(a.s[i] > b.s[i]) return false;
 	}
-	int len(){
-		return strlen(s);
-	}
-	operator [](int a){
-		return s[a];
-	}
-	bool operator < (struct string b){
-		int len1 = len(), len2 = b.len();
-		int len = (len1 < len1) ? len1 : len2;
-		for(int i = 0; i < len; ++i){
-			if(s[i] < b[i]) return true;
-			else if(s[i] > b[i]) return false;
-		}
-		return len1 < len2;
-	}
-}a[MAXN];
-
+	return len1 < len2;
+}
 int main(){
 	int n = 3;
 	for(int i = 1; i <= n; ++i){
+		scanf("%s", str[i].s);
 	}
-//	sort(str, 1, n);
+	
+	//Ã°ÅÝÅÅÐò 
 	for(int i = 1; i <= n; ++i){
+		for(int j = n; j > i; --j){ 
+			if(cmp(str[j], str[j - 1])){
+				struct string tmp;
+				tmp = str[j];
+				str[j] = str[j - 1];
+				str[j - 1] = tmp;
+			}
+		}
+	}
+	for(int i = 1; i <= n; ++i){
+		printf("%s\n", str[i].s);
 	}
 	return 0; 
 }
