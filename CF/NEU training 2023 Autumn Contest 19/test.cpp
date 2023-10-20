@@ -60,44 +60,31 @@ inline int read(){
 	}
 	return b?-a:a;
 }
-const int MAXN = 1010;
-ll f[MAXN][3];//从根，到根，从根到根
-struct edge{
-	int x, w;
-	edge():x(), w(){}
-	edge(int x, int w):x(x), w(w){}
-}input[MAXN];
-vector<struct edge> tree[MAXN];
-void dfs1(int p, int fa){
-	if(tree[p].size() == 1 && tree[p][0].x == fa){
-		f[p][0] = f[p][1] = f[p][2] = 0;
-		return;
-	}
-	int sum = 0;
-	frep(i, 0, tree[p].size()){
-		int x = tree[p][i].x;
-		sum += f[x][2] + tree[p][i].w * 2;
-	}
-	frep(i, 0, tree[p].size()){
-		int x = tree[p][i].x;
-		
-	}
-} 
+const int MAXN = 100010;
+ll a[MAXN];
+ll s[MAXN], l[MAXN];
 int main(){
-	int n = read();
-	while(n){
-		rep(i, 1, n) tree[i].clear();
-		rep(i, 2, n){
-			input[i].x = read();
+	int n = read(), t = read() + 1;
+	rep(i, 1, n) a[i] = read();
+	s[1] = 1; l[1] = a[1];
+	rep(i, 2, n){
+		if(a[i] <= l[i - 1]){
+			s[i] = s[i - 1] + a[i];
+			l[i] = l[i - 1];
 		}
-		rep(i, 2, n){
-			input[i].w = read();
+		else{
+			s[i] = s[i - 1] + l[i - 1];
+			l[i] = a[i];
 		}
-		rep(i, 2, n){
-			tree[i].push_back(input[i]);
-			tree[input[i].x].push_back(edge(i, input[i].w));
+	}
+	rep(i, 1, n){
+		if(t <= s[i] + l[i] - 1){
+			printf("1\n");
 		}
-		dfs1(1, 0);
+		else{
+			printf("%lld\n", (t - (s[i] + l[i] - 1)) / l[i] + (((t - (s[i] + l[i] - 1)) % l[i]) ? 1 : 0) + 1);
+//			int ans = 
+		}
 	}
 	return 0;
 }
