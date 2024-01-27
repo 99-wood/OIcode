@@ -106,7 +106,6 @@ void ISAP(){
 }
 int main(){
 	memset(head, -1, sizeof(head));
-	memset(head, -1, sizeof(dep));
 	n = read(), m = read(), s = read(), t = read();
 	rep(i, 1, m){
 		int x = read(), y = read(), f = read();
