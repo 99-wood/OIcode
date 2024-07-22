@@ -125,7 +125,7 @@ struct treap{
 		upd(p);
 	}
 	public:
-	treap(T v){
+	treap(T v = T()){
 		tree.push_back(node(v, 0));
 		return;
 	}
@@ -143,7 +143,7 @@ struct treap{
 	T kth(int k){
 		int x, y, z;
 		split2(root, k, x, z);
-		split2(root, k - 1, x, y);
+		split2(x, k - 1, x, y);
 		T ans = tree[y].w;
 		root = merge(merge(x, y), z);
 		return ans;
