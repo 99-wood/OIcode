@@ -1,226 +1,10 @@
-# 数学
+#include <bits/stdc++.h>
 
-## 数论
-
-### 线性递推求逆元
-
-```cpp
-inv[1]=1;
-for(int i=2;i<p&&i<=n;++i){
-	inv[i]=(p-p/i)*inv[p%i]%p;
-}
-```
-
-### 求区间因数个数 $O(\sqrt{n})$
-
-```cpp
-// 求 [1,n] 之间每个数因数和，数论分块
-void solve(){
-	int n;
-	cin >> n;
-	ll ans = 0;
-	for(int i = 1; i <= n; ++i){
-		int k = n / i;
-		int r = min(n / k, n);
-		ans += k * (r - i + 1);
-		i = r;
-	}
-	cout << ans << endl;
-	return;
-}
-```
-
-### 扩展欧几里得
-
-```cpp
-// 求解 ax + by = gcd(a, b)
-void exgcd(ll a, ll b, ll &x, ll &y){
-	if(b == 0){
-		x = 1;
-		y = 0;
-		return;
-	}
-	exgcd(b, a % b, y, x);
-	y = y - a / b * x;
-	return;
-}
-```
-
-```cpp
-// OI-wiki 非递归写法
-int exgcd(int a, int b, int &x, int &y) {
-  int x1 = 1, x2 = 0, x3 = 0, x4 = 1;
-  while (b != 0) {
-    int c = a / b;
-    std::tie(x1, x2, x3, x4, a, b) =
-        std::make_tuple(x3, x4, x1 - x3 * c, x2 - x4 * c, b, a - b * c);
-  }
-  x = x1, y = x2;
-  return a;
-}
-```
-
-### BSGS
-```cpp
-// 求解 a^x = b (mod p)
-// 无解返回 -1
-// 2 <= a, b < p < 2 ^ 32
-ll BSGS(ll a, ll b, ll p){
-	ll k = sqrt(p) + 1;
-	unordered_map<ll, ll> s;
-	ll now = b;
-	rep(i, 0, k){
-		s[now] = i;
-		now = now * a % p;
-	}
-	ll ak = 1;
-	rep(i, 1, k) ak = ak * a % p;
-	now = ak;
-	rep(i, 1, k){
-		if(s.count(now)){
-			return i * k - s[now];
-		}
-		now = now * ak % p;
-	}
-	return -1;
-}
-```
-
-## 排列组合
-
-### 球与盒子
-
-|球|箱|任意方式|至多一个球|至少一个球|
-|---|---|---|---|---|
-|可区分|可区分|1|2|3|
-|不可区分|可区分|4|5|6|
-|可区分|不可区分|7|8|9|
-|不可区分|不可区分|10|11|12|
-
-
-```cpp
-// 注意模数
-const int MOD = 1000000007;
-const int MAXN = 1000010;
-ll jc[MAXN];
-ll inv[MAXN];
-ll S[2000][2000];
-ll p[2000][2000];
-ll ksm(ll a, ll k){
-	if(k < 0) return 0;
-	ll ans = 1, now = a;
-	while(k){
-		if(k & 1) ans = (ans * now) % MOD;
-		now = (now * now) % MOD;
-		k >>= 1;
-	}
-	return ans;
-}
-ll C(int n, int m){
-	return jc[n] * inv[n - m] % MOD * inv[m] % MOD;
-}
-ll f1(ll n, ll k){
-	return ksm(k, n);
-}
-ll f2(ll n, ll k){
-	if(n > k) return 0;
-	return C(k, n) * jc[n] % MOD;
-}
-ll f3(ll n, ll k){
-	return jc[k] * S[n][k] % MOD;;
-}
-ll f4(ll n, ll k){
-	return C(n + k - 1, k - 1);
-}
-ll f5(ll n, ll k){
-	if(n > k) return 0;
-	return C(k, n);
-}
-ll f6(ll n, ll k){
-	return C(n - 1, k - 1);
-}
-ll f7(ll n, ll k){
-	ll ans = 0;
-	rep(i, 0, k){
-		ans += S[n][k - i];
-	}
-	return ans % MOD;
-}
-ll f8(ll n, ll k){
-	if(n > k) return 0;
-	return 1;
-}
-ll f9(ll n, ll k){
-	return S[n][k];
-}
-ll f10(ll n, ll k){
-	ll ans = 0;
-	rep(i, 0, k){
-		ans += p[n][k - i];
-	}
-	return ans % MOD;
-}
-ll f11(ll n, ll k){
-	if(n > k) return 0;
-	return 1;
-}
-ll f12(ll n, ll k){
-	return p[n][k];
+inline int read() {
+    char c; int x; for (c = getchar(); !isdigit(c); c = getchar());
+    for (x = 0; isdigit(c); c = getchar()) { x = x * 10 + c - '0'; } return x;
 }
 
-int main(){
-	int N = 100000;
-	jc[0] = 1;
-	rep(i, 1, N) jc[i] = (jc[i - 1] * i) % MOD;
-	inv[N] = ksm(jc[N], MOD - 2);
-	drep(i, N - 1, 0) inv[i] = inv[i + 1] * (i + 1) % MOD;
-	int n = 1000;
-	S[0][0] = 1;
-	rep(i, 1, n){
-		S[i][i] = 1;
-		S[i][0] = 0;
-		rep(j, 1, i - 1){
-			S[i][j] = (S[i - 1][j - 1] + j * S[i - 1][j]) % MOD;
-		}
-	}
-	p[0][0] = 1;
-	rep(i, 1, n){
-		p[i][i] = 1;
-		p[i][0] = 0;
-		rep(j, 1, i - 1){
-			p[i][j] = p[i - 1][j - 1];
-			if(i >= j) p[i][j] = (p[i][j] + p[i - j][j]) % MOD;
-		}
-	}
-	int t;
-	cin >> t;
-	while(t--){
-		int op, n, k;
-		cin >> op >> n >> k;
-		ll ans;
-		switch(op){
-			case 1: ans = f1(n, k); break;
-			case 2: ans = f2(n, k); break;
-			case 3: ans = f3(n, k); break;
-			case 4: ans = f4(n, k); break;
-			case 5: ans = f5(n, k); break;
-			case 6: ans = f6(n, k); break;
-			case 7: ans = f7(n, k); break;
-			case 8: ans = f8(n, k); break;
-			case 9: ans = f9(n, k); break;
-			case 10: ans = f10(n, k); break;
-			case 11: ans = f11(n, k); break;
-			case 12: ans = f12(n, k); break;
-		}
-		cout << ans << endl;
-	}
-    return 0;
-}
-```
-## 多项式
-
-### 全家桶
-```cpp
 const int mod = 998244353, gen = 3;
 
 inline int add(int x, int y) {
@@ -255,7 +39,7 @@ namespace Combin {
     inline int binom(int n, int m) {
         if (n < m || m < 0) { return 0; }
         getCombin(n);
-        return 1ll * fac[n] * invf[m] % mod * invf[n - m] % mod;
+        return 1ll * fac[n] * invf[m] % mod * invf[n - m] % mod; 
     }
 }
 
@@ -332,7 +116,7 @@ namespace Polynom {
         f = polyInv(f, n); f.resize(m);
         return f;
     }
-
+    
     std::vector<int> polyDeri(std::vector<int> f) {
         if (f.empty()) { return f; }
         int m = f.size();
@@ -348,7 +132,7 @@ namespace Polynom {
         f[0] = 0;
         return f;
     }
-
+    
     std::vector<int> polyLn(std::vector<int> f) {
         if (f.empty()) { return f; }
         int m = f.size();
@@ -382,36 +166,15 @@ namespace Polynom {
 using Polynom::operator ~;
 using Polynom::operator *;
 
+int n;
 std::vector<int> f, g;
 
-signed main() {
-    ios::sync_with_stdio(false); cin.tie(0); cout.tie(0);
-    int n = 10;
-    f.resize(n);
-    for(int i = 0; i < n; ++i) f[i] = n - i;
-
-    g = f * f; // 多项式乘法
-    for(auto x : g) cout << x << " "; // output: 100 180 241 284 310 320 315 296 264 220 165 120 84 56 35 20 10 4 1
-    cout << endl;
-
-    // 反转数组
-    for(auto x : Polynom::rev) cout << x << " ";// output: 0 16 8 24 4 20 12 28 2 18 10 26 6 22 14 30 1 17 9 25 5 21 13 29 3 19 11 27 7 23 15 31 299473306 529069507 981274199 7799
-
-    g = ~f; // 多项式求逆
-    for(auto x : g) cout << x << " "; // output: 299473306 529069507 981274199 779928313 758096709 534433074 787525252 466980036 314029169 45958780
-    cout << endl;
-
-    std::vector<int> ans = g * f; //检验
-    for(auto x : ans) cout << x << " "; // output: 1 0 0 0 0 0 0 0 0 0 492697773 286624499 609620732 915646811 5112497 850919245 234670361 405946729 45958780
-    cout << endl;
-
-    g = Polynom::polyLn(f); // 多项式对数
-    for(auto x : g) cout << x << " "; // output: 0 698771048 284499641 208633070 271946718 638610853 568755876 136957799 418817133 919723866
-    cout << endl;
-
-    g = Polynom::polyExp(f); // 多项式指数
-    for(auto x : g) cout << x << " "; // output: 1 9 499122225 499122377 623903419 224607130 420100524 572223576 14670202 295773748
-    cout << endl;
+int main() {
+    n = read(); f.resize(n); g.resize(n);
+    for (int i = 0; i < n; i++) { f[i] = read(); }
+    for (int i = 0; i < n; i++) { g[i] = read(); }
+    f = f * g;
+    // f = ~f;
+    for (int i = 0; i < n; i++) { printf("%d ", f[i]); }
     return 0;
 }
-```
